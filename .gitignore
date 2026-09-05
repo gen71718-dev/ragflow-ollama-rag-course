@@ -1,0 +1,25 @@
+# 敏感信息（严禁提交）
+.env
+*.env
+!*.example
+app-*
+*.key
+*.pem
+
+# 本地输出与临时目录
+/outputs/
+/work/
+*.log
+
+# 系统 / 编辑器
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Python / Node
+__pycache__/
+node_modules/
+venv/
+.venv/
+dist/

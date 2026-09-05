@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>业务问答系统 - Demo</title>
+  <style>
+    body { font-family: "Microsoft YaHei", sans-serif; margin: 0; background: #f0f2f5; display: flex; justify-content: center; }
+    .app { width: 640px; max-width: 100vw; height: 100vh; display: flex; flex-direction: column; background: #fff; box-shadow: 0 0 20px rgba(0,0,0,.08); }
+    header { background: #2563eb; color: #fff; padding: 14px 18px; font-size: 17px; font-weight: bold; }
+    #msgs { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+    .msg { max-width: 80%; padding: 10px 12px; border-radius: 10px; line-height: 1.6; white-space: pre-wrap; word-break: break-word; }
+    .user { align-self: flex-end; background: #2563eb; color: #fff; }
+    .bot { align-self: flex-start; background: #f1f3f5; color: #222; }
+    .err { align-self: flex-start; background: #fee2e2; color: #b91c1c; }
+    footer { display: flex; gap: 8px; padding: 12px; border-top: 1px solid #eee; }
+    input { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; }
+    button { padding: 10px 18px; border: 0; border-radius: 8px; background: #2563eb; color: #fff; font-size: 15px; cursor: pointer; }
+    button:disabled { background: #9db8f5; cursor: not-allowed; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>🤖 星火智造 · 业务智能问答</header>
+    <div id="msgs">
+      <div class="msg bot">你好，我是企业知识库助手。请问 XH-200 智能网关最多能接几个传感器？</div>
+    </div>
+    <footer>
+      <input id="input" placeholder="输入你的问题，回车发送…" autocomplete="off">
+      <button id="send">发送</button>
+    </footer>
+  </div>
+
+  <script>
+    // ===== 配置区（演示用；真实业务系统密钥应放在后端，不能暴露给前端）=====
+    // 把下面的占位符替换成你自己的环境：
+    //   <SERVER_IP>    = Linux 服务器内网 IP（跑 Dify/RAGFlow 那台）
+    //   <APP_API_KEY>  = 平台生成的应用 API Key
+    // 本示例按 Dify 已实测的格式编写（POST /v1/chat-messages）。
+    // 若接 RAGFlow 服务 API（OpenAI 兼容格式），请按其发布页的 Base URL
+    // 与请求体调整下方 API_URL / body（参考 api-examples/ragflow-openai.sh）。
+    const API_KEY = "<APP_API_KEY>";
+    const API_URL = "http://<SERVER_IP>/v1/chat-messages"; // Dify 服务端地址
+    // ============================================================
+
+    let conversationId = ""; // 多轮会话编号，由平台返回后自动保存
+    const msgs = document.getElementById("msgs");
+    const input = document.getElementById("input");
+    const sendBtn = document.getElementById("send");
+
+    function append(role, text) {
+      const div = document.createElement("div");
+      div.className = "msg " + (role === "user" ? "user" : role === "err" ? "err" : "bot");
+      div.textContent = text;
+      msgs.appendChild(div);
+      msgs.scrollTop = msgs.scrollHeight;
+    }
+
+    async function ask() {
+      const query = input.value.trim();
+      if (!query) return;
+      input.value = "";
+      append("user", query);
+      sendBtn.disabled = true;
+      sendBtn.textContent = "思考中…";
+
+      try {
+        const resp = await fetch(API_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + API_KEY
+          },
+          body: JSON.stringify({
+            inputs: {},
+            query: query,
+            response_mode: "blocking",
+            conversation_id: conversationId,
+            user: "web-demo"
+          })
+        });
+        const data = await resp.json();
+        if (!resp.ok) {
+          append("err", "接口错误 " + resp.status + ": " + (data.message || JSON.stringify(data)));
+          return;
+        }
+        conversationId = data.conversation_id || conversationId; // 保存会话，实现多轮
+        append("bot", data.answer || "(无回答)");
+      } catch (e) {
+        append("err", "请求失败：" + e.message);
+      } finally {
+        sendBtn.disabled = false;
+        sendBtn.textContent = "发送";
+      }
+    }
+
+    sendBtn.onclick = ask;
+    input.onkeydown = (e) => { if (e.key === "Enter") ask(); };
+  </script>
+</body>
+</html>
