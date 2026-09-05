@@ -1,0 +1,21 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: springboot-demo
+
+# ===== AI 平台配置 =====
+# 运行前把占位符替换成你自己的环境（与仓库其它示例一致，勿提交真实密钥）：
+#   dify    -> Dify 应用 API，多轮会话格式，同 api-examples/chat.py / web-demo/index.html
+#   ragflow -> RAGFlow「服务 API」OpenAI 兼容格式，同 api-examples/ragflow-openai.sh
+ai:
+  platform: dify          # dify | ragflow
+  dify:
+    url: http://192.168.233.3/v1/chat-messages
+    api-key: sk-958dd781bb3e4555aa51987475ff588a
+    user: business-demo
+  ragflow:
+    url: http://192.168.233.3/v1/chat/completions
+    api-key: sk-958dd781bb3e4555aa51987475ff588a
+    model: <RF_MODEL>

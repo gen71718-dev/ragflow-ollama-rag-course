@@ -51,6 +51,7 @@ flowchart LR
 # 2. 启动 Ollama 并拉取模型 qwen2.5:7b + bge-m3（见 docs/03-ollama-models.md）
 # 3. 部署 RAGFlow、建知识库、导入示例文档、创建问答应用（见 docs/04-ragflow-mainline.md）
 # 4. 打通 Web API / 业务系统接入（见 docs/05-web-api.md、docs/06-business-integration.md）
+# 5. (可选) 用 Spring Boot 封装成内部 REST 接口（见 springboot-demo/README.md）
 # 路线 B（Dify 对比）见 docs/07-route-b-dify.md
 ```
 
@@ -75,9 +76,22 @@ flowchart LR
 ├── deploy/                    # 部署用模板（.env 补丁、内存优化说明）
 ├── scripts/                   # 一键巡检脚本
 ├── web-demo/                  # 业务系统接入示例（网页对话框 demo）
+├── springboot-demo/            # 业务系统后端接入示例（Spring Boot 3 + Java 17）
 └── .gitignore
 ```
 
+## 🧩 业务系统后端接入（Spring Boot demo）
+
+浏览器直接调用平台 API 会把 Key 暴露在前端，生产上应由**后端统一持有密钥**并封装接口。
+[springboot-demo/](springboot-demo/README.md) 提供最小可运行的 Spring Boot 3 后端（Java 17，代码已本地编译并启动验证）：
+
+- `POST /api/chat`：把业务问题转发给 Dify 或 RAGFlow，返回 `answer + conversation_id`，支持多轮对话
+- 平台二选一：改 `application.yml` 的 `ai.platform=dify|ragflow`，业务代码不用动
+- 运行：`cd springboot-demo && mvn spring-boot:run`，详见 [springboot-demo/README.md](springboot-demo/README.md)
+
+> 注意：首次运行请替换 `<SERVER_IP>`、`<APP_API_KEY>`、`<RF_MODEL>` 占位符并真机联调验证。
+
+---
 
 ## ⚠️ 安全与许可
 
