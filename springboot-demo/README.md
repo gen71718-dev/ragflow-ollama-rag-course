@@ -6,7 +6,7 @@
 
 ## 技术栈
 
-- Java 17 + Spring Boot 3.3（Web）
+- Java 21 + Spring Boot 3.3（Web）
 - `RestTemplate` 发起 HTTP 调用，Jackson 解析 JSON
 - 无数据库、无第三方中间件依赖（部署层的 RAGFlow/Dify 内部已有 ES/MySQL，业务封装层不需要再连库）
 
