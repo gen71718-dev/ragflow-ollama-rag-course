@@ -6,7 +6,7 @@
 
 | 姿势 | 适用 | 说明 |
 |---|---|---|
-| 网页 Demo（本仓库） | 演示、给面试官看 | `web-demo/index.html`，纯前端调用（演示用） |
+| 网页 Demo（本仓库） | 演示 | `web-demo/index.html`，纯前端调用（演示用） |
 | 后端调用（推荐生产） | 真实业务系统 | 密钥放后端，用 curl/Python/Java 等调 API（见 api-examples） |
 
 > 红线：前端直接带 API Key 只能用于本地演示；真实系统务必走后端代理。
